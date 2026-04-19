@@ -1,0 +1,51 @@
+{
+  "name": "smart-seo-lite",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Add SEO to your React/Next.js app in 3 lines of code. Auto meta tags, JSON-LD schema, and smart image SEO.",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "keywords": [
+    "seo",
+    "react",
+    "nextjs",
+    "meta-tags",
+    "open-graph",
+    "schema",
+    "json-ld",
+    "twitter-card",
+    "canonical",
+    "image-seo"
+  ],
+  "author": "Virendra",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "rollup": "^3.0.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/virendra2902/smart-seo-lite"
+  },
+  "homepage": "https://virendra2902.github.io/smart-seo-lite",
+  "bugs": {
+    "url": "https://github.com/virendra2902/smart-seo-lite/issues"
+  }
+}

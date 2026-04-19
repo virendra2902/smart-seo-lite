@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>smart-seo-lite — SEO for React in 3 lines</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060812;
+      --surface: #0d1221;
+      --border: #1e2a45;
+      --accent: #4fffb0;
+      --accent2: #6c6cff;
+      --accent3: #ff6c6c;
+      --text: #e8edf8;
+      --muted: #6b7a99;
+      --card: #0f1829;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(76, 255, 176, 0.07); top: -200px; left: -200px; }
+    .orb-2 { width: 500px; height: 500px; background: rgba(108, 108, 255, 0.08); bottom: 100px; right: -150px; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 48px;
+      background: rgba(6, 8, 18, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #060812 !important;
+      padding: 8px 20px; border-radius: 8px; font-weight: 700 !important;
+      font-size: 0.85rem !important;
+    }
+    .nav-cta:hover { opacity: 0.9; }
+
+    /* SECTIONS */
+    section { position: relative; z-index: 1; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(76, 255, 176, 0.08);
+      border: 1px solid rgba(76, 255, 176, 0.25);
+      color: var(--accent);
+      padding: 6px 16px; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px;
+      margin-bottom: 32px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge::before { content: '●'; font-size: 0.5rem; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+    h1 .green { color: var(--accent); }
+    h1 .dim { color: var(--muted); }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+    .btn-primary {
+      background: var(--accent); color: #060812;
+      padding: 14px 32px; border-radius: 10px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem; text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 32px rgba(76,255,176,0.25);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(76,255,176,0.4); }
+    .btn-secondary {
+      background: var(--surface); color: var(--text);
+      padding: 14px 32px; border-radius: 10px; font-weight: 600;
+      border: 1px solid var(--border); font-size: 0.9rem;
+      text-decoration: none; transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Stats row */
+    .stats {
+      display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 2rem; color: var(--accent);
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+    /* INSTALL STRIP */
+    .install-strip {
+      background: var(--surface);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 20px 0; overflow: hidden;
+    }
+    .install-inner {
+      display: flex; gap: 48px; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;
+      flex-wrap: wrap; padding: 0 24px;
+    }
+    .install-cmd {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted);
+    }
+    .install-cmd code { color: var(--accent); }
+    .install-sep { color: var(--border); font-size: 1.5rem; }
+
+    /* FEATURES */
+    .features { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem; color: var(--accent2); letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: -1px; margin-bottom: 16px;
+    }
+    .section-sub { color: var(--muted); font-size: 1.05rem; max-width: 500px; }
+
+    .features-header { margin-bottom: 64px; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent)), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover { border-color: rgba(76,255,176,0.3); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card.blue { --card-accent: var(--accent2); }
+    .feature-card.blue:hover { border-color: rgba(108,108,255,0.3); }
+    .feature-card.red { --card-accent: var(--accent3); }
+    .feature-card.red:hover { border-color: rgba(255,108,108,0.3); }
+
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 20px;
+      background: rgba(76,255,176,0.1);
+    }
+    .feature-card.blue .feature-icon { background: rgba(108,108,255,0.1); }
+    .feature-card.red .feature-icon { background: rgba(255,108,108,0.1); }
+
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.2rem; margin-bottom: 12px;
+    }
+    .feature-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 20px; }
+    .feature-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+      padding: 4px 10px; border-radius: 6px;
+      background: rgba(76,255,176,0.08); color: var(--accent); border: 1px solid rgba(76,255,176,0.15);
+    }
+    .feature-card.blue .tag { background: rgba(108,108,255,0.08); color: #9090ff; border-color: rgba(108,108,255,0.15); }
+    .feature-card.red .tag { background: rgba(255,108,108,0.08); color: #ff9090; border-color: rgba(255,108,108,0.15); }
+
+    /* CODE SECTION */
+    .code-section { padding: 100px 24px; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .code-inner { max-width: 1000px; margin: 0 auto; }
+    .code-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+
+    .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
+    .tab {
+      padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace; cursor: pointer;
+      transition: all 0.2s; color: var(--muted); border: none; background: none;
+    }
+    .tab.active { background: var(--accent); color: #060812; }
+
+    .code-blocks { position: relative; }
+    .code-block {
+      background: var(--bg); border-radius: 16px; border: 1px solid var(--border);
+      overflow: hidden; display: none;
+    }
+    .code-block.active { display: block; }
+    .code-topbar {
+      display: flex; align-items: center; padding: 14px 20px;
+      border-bottom: 1px solid var(--border); gap: 12px;
+    }
+    .dots { display: flex; gap: 6px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .code-filename { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+
+    pre {
+      padding: 28px; overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;
+      line-height: 1.8;
+    }
+    .kw { color: #c792ea; }
+    .fn { color: #82aaff; }
+    .str { color: #c3e88d; }
+    .cm { color: #546e7a; font-style: italic; }
+    .acc { color: var(--accent); }
+    .acc2 { color: #ffcb6b; }
+    .op { color: var(--muted); }
+
+    /* COMPARISON TABLE */
+    .compare { padding: 100px 24px; max-width: 900px; margin: 0 auto; }
+    .compare-table {
+      width: 100%; border-collapse: collapse; margin-top: 48px;
+    }
+    .compare-table th {
+      padding: 16px 20px; text-align: left;
+      font-family: 'Syne', sans-serif; font-size: 0.85rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .compare-table th:last-child { color: var(--accent); }
+    .compare-table td {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      font-size: 0.875rem; color: var(--muted);
+    }
+    .compare-table td:first-child { color: var(--text); font-weight: 500; }
+    .yes { color: var(--accent) !important; font-weight: 600; }
+    .no { color: var(--accent3) !important; }
+    .partial { color: #ffcb6b !important; }
+    .compare-table tr:hover td { background: var(--surface); }
+
+    /* CTA BOTTOM */
+    .cta-bottom {
+      padding: 100px 24px; text-align: center;
+    }
+    .cta-box {
+      max-width: 700px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 64px 48px;
+      position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: ''; position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 300px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .cta-box h2 {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 2.2rem; letter-spacing: -1px; margin-bottom: 16px;
+    }
+    .cta-box p { color: var(--muted); margin-bottom: 36px; font-size: 1.05rem; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    footer p { font-size: 0.8rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    /* RESPONSIVE */
+    @media(max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .features, .code-section, .compare, .cta-bottom { padding: 60px 16px; }
+      .cta-box { padding: 40px 24px; }
+      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">smart-seo-<span>lite</span></div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#code">Examples</a>
+    <a href="#compare">Compare</a>
+    <a href="https://npmjs.com/package/smart-seo-lite" class="nav-cta">npm install →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">v1.0.0 · MIT Licensed · &lt;3KB gzipped</div>
+  <h1>
+    Add SEO to your<br>
+    <span class="green">React app</span><br>
+    <span class="dim">in 3 lines.</span>
+  </h1>
+  <p class="hero-sub">
+    One lightweight package that handles meta tags, Open Graph, JSON-LD schema,
+    and smart image SEO — no configuration, no bloat.
+  </p>
+  <div class="hero-actions">
+    <a href="https://npmjs.com/package/smart-seo-lite" class="btn-primary">
+      npm install smart-seo-lite
+    </a>
+    <a href="https://github.com/your-username/smart-seo-lite" class="btn-secondary">
+      View on GitHub →
+    </a>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">&lt;3KB</div>
+      <div class="stat-label">gzipped bundle</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">dependencies</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">80%</div>
+      <div class="stat-label">SEO needs covered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">APIs to learn</div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL STRIP -->
+<div class="install-strip">
+  <div class="install-inner">
+    <div class="install-cmd">$ <code>npm install smart-seo-lite</code></div>
+    <div class="install-sep">|</div>
+    <div class="install-cmd">$ <code>yarn add smart-seo-lite</code></div>
+    <div class="install-sep">|</div>
+    <div class="install-cmd">$ <code>pnpm add smart-seo-lite</code></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-header">
+    <div class="section-tag">// what's inside</div>
+    <h2 class="section-title">Everything SEO.<br>Nothing extra.</h2>
+    <p class="section-sub">Three focused APIs that cover the SEO needs of 90% of React applications.</p>
+  </div>
+
+  <div class="features-grid">
+    <!-- Feature 1 -->
+    <div class="feature-card">
+      <div class="feature-icon">🪝</div>
+      <h3>useSEO Hook</h3>
+      <p>Drop one hook into any component. Automatically manages your page's title, all meta tags, Open Graph, Twitter Cards, and canonical URL.</p>
+      <div class="feature-tags">
+        <span class="tag">title</span>
+        <span class="tag">description</span>
+        <span class="tag">og:image</span>
+        <span class="tag">twitter:card</span>
+        <span class="tag">canonical</span>
+        <span class="tag">robots</span>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="feature-card blue">
+      <div class="feature-icon">🧩</div>
+      <h3>Schema Component</h3>
+      <p>Generate perfectly valid JSON-LD structured data with zero manual writing. Supports 7 schema types with type-safe data props.</p>
+      <div class="feature-tags">
+        <span class="tag">article</span>
+        <span class="tag">product</span>
+        <span class="tag">faq</span>
+        <span class="tag">breadcrumb</span>
+        <span class="tag">organization</span>
+        <span class="tag">person</span>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="feature-card red">
+      <div class="feature-icon">🖼️</div>
+      <h3>SEOImg Component</h3>
+      <p>Smart image component that auto-generates alt text, applies lazy loading, and gives helpful dev console warnings for CLS issues.</p>
+      <div class="feature-tags">
+        <span class="tag">auto-alt</span>
+        <span class="tag">lazy loading</span>
+        <span class="tag">dev warnings</span>
+        <span class="tag">CLS prevention</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE SECTION -->
+<section class="code-section" id="code">
+  <div class="code-inner">
+    <div class="code-header">
+      <div>
+        <div class="section-tag">// code examples</div>
+        <h2 class="section-title">Simple by design.</h2>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('hook')">useSEO</button>
+        <button class="tab" onclick="showTab('schema')">Schema</button>
+        <button class="tab" onclick="showTab('img')">SEOImg</button>
+      </div>
+    </div>
+
+    <div class="code-blocks">
+      <!-- useSEO tab -->
+      <div class="code-block active" id="tab-hook">
+        <div class="code-topbar">
+          <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+          <span class="code-filename">pages/home.tsx</span>
+        </div>
+        <pre><span class="kw">import</span> { <span class="fn">useSEO</span> } <span class="kw">from</span> <span class="str">'smart-seo-lite'</span>;
+
+<span class="kw">function</span> <span class="fn">HomePage</span>() {
+  <span class="cm">// ✅ One hook → full SEO coverage</span>
+  <span class="fn">useSEO</span>({
+    title:       <span class="str">"Best Running Shoes | My Shop"</span>,
+    description: <span class="str">"Top-rated running shoes for every runner"</span>,
+    image:       <span class="str">"/og-banner.png"</span>,
+    type:        <span class="str">"website"</span>,
+    keywords:    [<span class="str">"running shoes"</span>, <span class="str">"athletics"</span>],
+  });
+
+  <span class="kw">return</span> &lt;<span class="acc2">main</span>&gt;...&lt;/<span class="acc2">main</span>&gt;;
+}
+
+<span class="cm">// Automatically sets:
+// ✅ &lt;title&gt;Best Running Shoes | My Shop&lt;/title&gt;
+// ✅ &lt;meta name="description" content="..." /&gt;
+// ✅ &lt;meta property="og:title" content="..." /&gt;
+// ✅ &lt;meta property="og:image" content="..." /&gt;
+// ✅ &lt;meta name="twitter:card" content="summary_large_image" /&gt;
+// ✅ &lt;link rel="canonical" href="..." /&gt;</span></pre>
+      </div>
+
+      <!-- Schema tab -->
+      <div class="code-block" id="tab-schema">
+        <div class="code-topbar">
+          <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+          <span class="code-filename">pages/blog-post.tsx</span>
+        </div>
+        <pre><span class="kw">import</span> { <span class="fn">Schema</span> } <span class="kw">from</span> <span class="str">'smart-seo-lite'</span>;
+
+<span class="cm">// Article Schema</span>
+&lt;<span class="fn">Schema</span> type=<span class="str">"article"</span> data={{
+  title:         <span class="str">"How to Train for a Marathon"</span>,
+  author:        <span class="str">"Virendra"</span>,
+  datePublished: <span class="str">"2025-01-15"</span>,
+  description:   <span class="str">"Complete 16-week training guide"</span>,
+}} /&gt;
+
+<span class="cm">// Product Schema</span>
+&lt;<span class="fn">Schema</span> type=<span class="str">"product"</span> data={{
+  name:         <span class="str">"Pro Running Shoes X2"</span>,
+  price:        <span class="acc">99.99</span>,
+  currency:     <span class="str">"USD"</span>,
+  availability: <span class="str">"InStock"</span>,
+  brand:        <span class="str">"SpeedBrand"</span>,
+}} /&gt;
+
+<span class="cm">// FAQ Schema — great for voice search</span>
+&lt;<span class="fn">Schema</span> type=<span class="str">"faq"</span> data={{
+  questions: [
+    { question: <span class="str">"Free shipping?"</span>, answer: <span class="str">"Yes, orders over $50"</span> },
+  ]
+}} /&gt;</pre>
+      </div>
+
+      <!-- SEOImg tab -->
+      <div class="code-block" id="tab-img">
+        <div class="code-topbar">
+          <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+          <span class="code-filename">components/ProductCard.tsx</span>
+        </div>
+        <pre><span class="kw">import</span> { <span class="fn">SEOImg</span> } <span class="kw">from</span> <span class="str">'smart-seo-lite'</span>;
+
+<span class="cm">// Auto-generates alt from title</span>
+&lt;<span class="fn">SEOImg</span>
+  src=<span class="str">"/products/shoe-x2.jpg"</span>
+  title=<span class="str">"Pro Running Shoes X2"</span>
+  width={<span class="acc">600</span>}
+  height={<span class="acc">400</span>}
+/&gt;
+
+<span class="cm">// ✅ Renders as:
+// &lt;img
+//   src="/products/shoe-x2.jpg"
+//   alt="Pro Running Shoes X2"
+//   loading="lazy"
+//   width="600"
+//   height="400"
+// /&gt;</span>
+
+<span class="cm">// In development: warns if alt/title missing
+// ⚠️ [smart-seo-lite] &lt;SEOImg&gt; has no explicit 'alt'
+//    Auto-generated: "shoe x2". Consider explicit alt.</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="compare" id="compare">
+  <div class="section-tag">// vs alternatives</div>
+  <h2 class="section-title">Why smart-seo-lite?</h2>
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>react-helmet</th>
+        <th>next-seo</th>
+        <th>smart-seo-lite</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Bundle size</td>
+        <td class="partial">~11KB</td>
+        <td class="partial">~22KB</td>
+        <td class="yes">&lt;3KB ✓</td>
+      </tr>
+      <tr>
+        <td>Zero dependencies</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+      </tr>
+      <tr>
+        <td>JSON-LD Schema</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+        <td class="yes">✓</td>
+      </tr>
+      <tr>
+        <td>Smart Image SEO</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+      </tr>
+      <tr>
+        <td>Works with React + Next.js</td>
+        <td class="partial">Partial</td>
+        <td class="partial">Next.js only</td>
+        <td class="yes">Both ✓</td>
+      </tr>
+      <tr>
+        <td>Dev warnings</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+      </tr>
+      <tr>
+        <td>TypeScript support</td>
+        <td class="partial">Partial</td>
+        <td class="yes">✓</td>
+        <td class="yes">✓</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CTA -->
+<section class="cta-bottom">
+  <div class="cta-box">
+    <h2>Ready to ship better SEO?</h2>
+    <p>One install. Three APIs. Covers 80% of what your React app needs.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a href="https://npmjs.com/package/smart-seo-lite" class="btn-primary">npm install smart-seo-lite</a>
+      <a href="https://github.com/your-username/smart-seo-lite" class="btn-secondary">GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Built with ❤️ by <strong>Virendra</strong> · <a href="https://npmjs.com/package/smart-seo-lite">npm</a> · <a href="https://github.com/your-username/smart-seo-lite">GitHub</a></p>
+  <p style="color:var(--muted); font-size:0.75rem">MIT License · &lt;3KB gzipped · Zero dependencies</p>
+</footer>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.code-block').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${name}')"]`).classList.add('active');
+    document.getElementById(`tab-${name}`).classList.add('active');
+  }
+</script>
+</body>
+</html>

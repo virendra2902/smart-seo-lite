@@ -1,5 +1,12 @@
 import { useEffect } from "react";
 
+export interface AlternateLocale {
+  /** Language/region code, e.g. "en-US", "fr", "x-default" */
+  locale: string;
+  /** Fully-qualified URL for that locale's version of the page */
+  url: string;
+}
+
 export interface SEOProps {
   title?: string;
   description?: string;
@@ -11,6 +18,8 @@ export interface SEOProps {
   noIndex?: boolean;
   canonical?: string;
   keywords?: string[];
+  /** Multilingual SEO: renders <link rel="alternate" hreflang="..."> for each locale */
+  alternateLocales?: AlternateLocale[];
 }
 
 function setMeta(name: string, content: string, attr: "name" | "property" = "name") {
@@ -30,6 +39,20 @@ function setLink(rel: string, href: string) {
   if (!el) {
     el = document.createElement("link");
     el.setAttribute("rel", rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
+function setAlternateLink(hreflang: string, href: string) {
+  if (typeof document === "undefined") return;
+  let el = document.querySelector(
+    `link[rel="alternate"][hreflang="${hreflang}"]`
+  ) as HTMLLinkElement;
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "alternate");
+    el.setAttribute("hreflang", hreflang);
     document.head.appendChild(el);
   }
   el.setAttribute("href", href);
@@ -61,7 +84,10 @@ export function useSEO({
   noIndex = false,
   canonical,
   keywords = [],
+  alternateLocales = [],
 }: SEOProps) {
+  const localesKey = alternateLocales.map((l) => `${l.locale}:${l.url}`).join(",");
+
   useEffect(() => {
     if (typeof document === "undefined") return;
 
@@ -91,5 +117,20 @@ export function useSEO({
 
     // --- Canonical ---
     if (canonicalURL) setLink("canonical", canonicalURL);
-  }, [title, description, image, url, siteName, type, twitterHandle, noIndex, canonical, keywords]);
+
+    // --- Hreflang (multilingual SEO) ---
+    alternateLocales.forEach((alt) => setAlternateLink(alt.locale, alt.url));
+  }, [
+    title,
+    description,
+    image,
+    url,
+    siteName,
+    type,
+    twitterHandle,
+    noIndex,
+    canonical,
+    keywords,
+    localesKey,
+  ]);
 }

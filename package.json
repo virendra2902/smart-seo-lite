@@ -1,8 +1,7 @@
 {
   "name": "smart-seo-lite",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "Add SEO to your React/Next.js app in 3 lines of code. Auto meta tags, JSON-LD schema, and smart image SEO.",
+  "version": "2.0.0",
+  "description": "Add SEO to your React/Next.js app in 3 lines of code. Auto meta tags, JSON-LD schema, smart image SEO, breadcrumbs, sitemap/robots.txt generators, hreflang support, and a live dev SEO audit widget.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -24,7 +23,13 @@
     "json-ld",
     "twitter-card",
     "canonical",
-    "image-seo"
+    "image-seo",
+    "breadcrumbs",
+    "sitemap",
+    "robots-txt",
+    "hreflang",
+    "seo-audit",
+    "core-web-vitals"
   ],
   "author": "Virendra",
   "license": "MIT",
@@ -34,10 +39,10 @@
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
-    "@types/node": "^25.6.0",
-    "@types/react": "^19.2.14",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
     "rollup": "^3.0.0",
-    "tslib": "^2.8.1",
+    "tslib": "^2.6.0",
     "typescript": "^5.0.0"
   },
   "repository": {

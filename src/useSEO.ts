@@ -1,9 +1,8 @@
 import { useEffect } from "react";
+import { useSEODefaults } from "./SEOProvider";
 
 export interface AlternateLocale {
-  /** Language/region code, e.g. "en-US", "fr", "x-default" */
   locale: string;
-  /** Fully-qualified URL for that locale's version of the page */
   url: string;
 }
 
@@ -18,7 +17,6 @@ export interface SEOProps {
   noIndex?: boolean;
   canonical?: string;
   keywords?: string[];
-  /** Multilingual SEO: renders <link rel="alternate" hreflang="..."> for each locale */
   alternateLocales?: AlternateLocale[];
 }
 
@@ -65,72 +63,75 @@ function setAlternateLink(hreflang: string, href: string) {
  * ✅ Twitter Card tags
  * ✅ Canonical URL
  * ✅ Keywords, robots
+ * ✅ Hreflang (multilingual)
+ * ✅ Merges with SEOProvider global defaults (v3)
  *
  * @example
- * useSEO({
- *   title: "Home Page",
- *   description: "Best products online",
- *   image: "/banner.png"
- * });
+ * useSEO({ title: "Home Page", description: "Best products", image: "/banner.png" });
  */
-export function useSEO({
-  title,
-  description,
-  image,
-  url,
-  siteName = "My App",
-  type = "website",
-  twitterHandle,
-  noIndex = false,
-  canonical,
-  keywords = [],
-  alternateLocales = [],
-}: SEOProps) {
+export function useSEO(props: SEOProps) {
+  const defaults = useSEODefaults();
+
+  // Merge: page props override global defaults
+  const siteName = props.siteName ?? defaults.siteName ?? "My App";
+  const twitterHandle = props.twitterHandle ?? defaults.twitterHandle;
+  const defaultImage = props.image ?? defaults.defaultImage;
+  const alternateLocales = props.alternateLocales ?? [];
   const localesKey = alternateLocales.map((l) => `${l.locale}:${l.url}`).join(",");
+
+  // Append titleSeparator + siteName to title if separator is set and title doesn't already include siteName
+  let resolvedTitle = props.title;
+  if (
+    resolvedTitle &&
+    defaults.titleSeparator &&
+    siteName &&
+    !resolvedTitle.includes(siteName)
+  ) {
+    resolvedTitle = `${resolvedTitle}${defaults.titleSeparator}${siteName}`;
+  }
 
   useEffect(() => {
     if (typeof document === "undefined") return;
 
-    const resolvedURL = url || (typeof window !== "undefined" ? window.location.href : "");
-    const canonicalURL = canonical || resolvedURL;
+    const baseUrl = defaults.baseUrl?.replace(/\/$/, "") ?? "";
+    const resolvedURL =
+      props.url ||
+      (typeof window !== "undefined" ? window.location.href : "");
+    const canonicalURL = props.canonical || (baseUrl ? `${baseUrl}${typeof window !== "undefined" ? window.location.pathname : ""}` : resolvedURL);
 
-    // --- Basic Meta ---
-    if (title) document.title = title;
-    if (description) setMeta("description", description);
-    if (keywords.length > 0) setMeta("keywords", keywords.join(", "));
-    setMeta("robots", noIndex ? "noindex,nofollow" : "index,follow");
+    if (resolvedTitle) document.title = resolvedTitle;
+    if (props.description) setMeta("description", props.description);
+    if (props.keywords && props.keywords.length > 0)
+      setMeta("keywords", props.keywords.join(", "));
+    setMeta("robots", props.noIndex ? "noindex,nofollow" : "index,follow");
 
-    // --- Open Graph ---
-    if (title) setMeta("og:title", title, "property");
-    if (description) setMeta("og:description", description, "property");
-    if (image) setMeta("og:image", image, "property");
+    if (resolvedTitle) setMeta("og:title", resolvedTitle, "property");
+    if (props.description) setMeta("og:description", props.description, "property");
+    if (defaultImage) setMeta("og:image", defaultImage, "property");
     if (resolvedURL) setMeta("og:url", resolvedURL, "property");
-    setMeta("og:type", type, "property");
+    setMeta("og:type", props.type ?? "website", "property");
     setMeta("og:site_name", siteName, "property");
 
-    // --- Twitter Card ---
-    setMeta("twitter:card", image ? "summary_large_image" : "summary");
-    if (title) setMeta("twitter:title", title);
-    if (description) setMeta("twitter:description", description);
-    if (image) setMeta("twitter:image", image);
+    setMeta("twitter:card", defaultImage ? "summary_large_image" : "summary");
+    if (resolvedTitle) setMeta("twitter:title", resolvedTitle);
+    if (props.description) setMeta("twitter:description", props.description);
+    if (defaultImage) setMeta("twitter:image", defaultImage);
     if (twitterHandle) setMeta("twitter:site", twitterHandle);
 
-    // --- Canonical ---
     if (canonicalURL) setLink("canonical", canonicalURL);
 
-    // --- Hreflang (multilingual SEO) ---
     alternateLocales.forEach((alt) => setAlternateLink(alt.locale, alt.url));
   }, [
-    title,
-    description,
-    image,
-    url,
+    resolvedTitle,
+    props.description,
+    defaultImage,
+    props.url,
     siteName,
-    type,
+    props.type,
     twitterHandle,
-    noIndex,
-    canonical,
-    keywords,
+    props.noIndex,
+    props.canonical,
+    props.keywords,
     localesKey,
   ]);
 }

@@ -1,7 +1,7 @@
 {
   "name": "smart-seo-lite",
-  "version": "2.0.0",
-  "description": "Add SEO to your React/Next.js app in 3 lines of code. Auto meta tags, JSON-LD schema, smart image SEO, breadcrumbs, sitemap/robots.txt generators, hreflang support, and a live dev SEO audit widget.",
+  "version": "3.0.0",
+  "description": "Add SEO to your React/Next.js app in 3 lines of code. v3: SEOProvider context, Social Preview widget, generateMetaTags for App Router, Core Web Vitals monitoring, SEOLink, and more.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -29,21 +29,24 @@
     "robots-txt",
     "hreflang",
     "seo-audit",
-    "core-web-vitals"
+    "core-web-vitals",
+    "social-preview",
+    "prefetch",
+    "seo-provider"
   ],
   "author": "Virendra",
   "license": "MIT",
   "peerDependencies": {
-    "react": ">=17.0.0",
-    "react-dom": ">=17.0.0"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.0.0",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.31",
     "rollup": "^3.0.0",
-    "tslib": "^2.6.0",
-    "typescript": "^5.0.0"
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",
